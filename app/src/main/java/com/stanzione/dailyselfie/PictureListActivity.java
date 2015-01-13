@@ -15,9 +15,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class PictureListActivity extends ListActivity {
@@ -28,19 +30,21 @@ public class PictureListActivity extends ListActivity {
 	
 	String timeStamp;
 	String path;
-	
+
+    private static final int CONTEXT_MENU_DELETE = 1;
+
 	private Intent mNotificationReceiverIntent;
 	private PendingIntent mNotificationReceiverPendingIntent;
 	private static int TWO_MIN = 1000 * 60 * 2;
-	
+
 	private AlarmManager alarmManager;
-	
+
 	private static final String TAG = PictureListActivity.class.getSimpleName();
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		adapter = new PictureAdapter(getApplicationContext());
 //		adapter.removeAll();
 		
@@ -48,6 +52,8 @@ public class PictureListActivity extends ListActivity {
 		adapter.addAll();
 		
 		setAlarm();
+
+        registerForContextMenu(this.getListView());
 		
 	}
 
@@ -78,6 +84,34 @@ public class PictureListActivity extends ListActivity {
 		}
 		
 	}
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == this.getListView().getId()) {
+            ListView lv = this.getListView();
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            PictureRecord pictureRecord = (PictureRecord) lv.getAdapter().getItem(acmi.position);
+
+            menu.setHeaderTitle(pictureRecord.getTimestamp());
+            menu.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.NONE, "Delete");
+
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case CONTEXT_MENU_DELETE:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                Log.d(TAG, "Removing PictureRecord position: " + info.position);
+                PictureRecord pictureRecord = (PictureRecord) this.getListView().getAdapter().getItem(info.position);
+                adapter.remove(pictureRecord);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 	
 	public void startPhotoApp(){
 		

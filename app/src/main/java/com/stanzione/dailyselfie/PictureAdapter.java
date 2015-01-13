@@ -68,6 +68,8 @@ public class PictureAdapter extends BaseAdapter{
 		holder.picture.setImageBitmap(setPic(curr.getPath()));
 		holder.timestamp.setText(curr.getTimestamp());
 
+        newView.setLongClickable(true);
+
 		return newView;
 		
 	}
@@ -125,6 +127,18 @@ public class PictureAdapter extends BaseAdapter{
         }
 		
 	}
+
+    public void remove(PictureRecord pictureRecord){
+
+        File picFile = new File(pictureRecord.getPath());
+        if(picFile.exists()){
+            picFile.delete();
+        }
+
+        listPictures.remove(pictureRecord);
+        this.notifyDataSetChanged();
+
+    }
 	
 	public void removeAll(){
 		File storageDir = Environment.getExternalStoragePublicDirectory(

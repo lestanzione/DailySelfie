@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -46,7 +48,6 @@ public class PictureListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 
 		adapter = new PictureAdapter(getApplicationContext());
-//		adapter.removeAll();
 		
 		setListAdapter(adapter);
 		adapter.addAll();
@@ -68,19 +69,24 @@ public class PictureListActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		switch (item.getItemId()) {
-		case R.id.take_photo:
-			
-			startPhotoApp();
-			return true;
-			
-		case R.id.cancel_alarm:
-			
-			cancelAlarm();
-			return true;
+            case R.id.take_photo:
 
-		default:
+                startPhotoApp();
+                return true;
 
-			return super.onOptionsItemSelected(item);
+            case R.id.delete_all:
+
+                createDeleteAllDialog();
+                return true;
+
+            case R.id.cancel_alarm:
+
+                cancelAlarm();
+                return true;
+
+            default:
+
+                return super.onOptionsItemSelected(item);
 		}
 		
 	}
@@ -214,5 +220,33 @@ public class PictureListActivity extends ListActivity {
 		}
 		
 	}
+
+    private void createDeleteAllDialog(){
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(PictureListActivity.this);
+
+        alertDialogBuilder
+            .setMessage("Are you sure you want to delete all selfies?")
+            .setCancelable(false)
+            .setPositiveButton("Sure!",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        adapter.removeAll();
+
+                    }
+                })
+            .setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        dialog.cancel();
+
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
+    }
 	
 }
